@@ -675,44 +675,61 @@ function injectDoubaoPlusUI() {
       background: #f3f4f6;
     }
     
-    .doubao-plus-chat-menu {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-      z-index: 999999;
-      min-width: 200px;
-    }
-    
     .doubao-plus-chat-menu-content {
-      padding: 8px 0;
+      padding: 6px 0;
     }
     
     .doubao-plus-chat-menu-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
+      gap: 10px;
+      padding: 10px 14px;
       cursor: pointer;
-      border-radius: 6px;
-      transition: all 0.2s;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      background: transparent;
+      border: 1px solid transparent;
     }
     
     .doubao-plus-chat-menu-item:hover {
-      background: #f3f4f6;
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      transform: translateX(2px);
+    }
+    
+    .doubao-plus-chat-menu-item-danger {
+      color: #dc2626;
+    }
+    
+    .doubao-plus-chat-menu-item-danger:hover {
+      background: #fef2f2;
+      border-color: #fecaca;
     }
     
     .doubao-plus-chat-menu-item svg {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
+      color: #6b7280;
+      transition: all 0.15s ease;
+    }
+    
+    .doubao-plus-chat-menu-item:hover svg {
+      color: #3b82f6;
+    }
+    
+    .doubao-plus-chat-menu-item-danger svg {
+      color: #dc2626;
+    }
+    
+    .doubao-plus-chat-menu-item-danger:hover svg {
+      color: #ef4444;
     }
     
     .doubao-plus-chat-menu-item span {
-      font-size: 13px;
-      color: #374151;
+      flex: 1;
     }
   `
   
@@ -1187,13 +1204,20 @@ function navigateToChat(url: string) {
 }
 
 async function handleChatRemoveFromFolder(chatId: string) {
+  console.log('handleChatRemoveFromFolder called with chatId:', chatId)
   const chats = await getFromDB('chats')
   const chat = chats.find(c => c.id === chatId)
   
   if (chat) {
     chat.folderId = null
     await saveToDB('chats', chats)
-    loadContent('folders')
+    console.log('Chat removed from folder, refreshing folders list')
+    
+    const activeTab = document.querySelector('.doubao-plus-tab.active')
+    if (activeTab && activeTab.getAttribute('data-tab') === 'folders') {
+      console.log('Current tab is folders, reloading...')
+      await loadFoldersContent(document.querySelector('#folders-list') as HTMLElement)
+    }
   }
 }
 
@@ -1868,28 +1892,29 @@ function showChatActionMenu(button: HTMLElement) {
   
   const menu = document.createElement('div')
   menu.className = 'doubao-plus-chat-menu'
-  menu.innerHTML = `
+  
+  const menuContent = `
     <div class="doubao-plus-chat-menu-content">
       <div class="doubao-plus-chat-menu-item" data-action="save">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 21H5a2 2 0 00-2-2v-7a2 2 0 002 2h14a2 2 0 002-2v7"/>
         </svg>
         <span>保存对话</span>
       </div>
       <div class="doubao-plus-chat-menu-item" data-action="moveToFolder">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
         </svg>
         <span>移动到文件夹</span>
       </div>
       <div class="doubao-plus-chat-menu-item" data-action="star">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
         </svg>
         <span>星标</span>
       </div>
-      <div class="doubao-plus-chat-menu-item" data-action="delete">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="doubao-plus-chat-menu-item doubao-plus-chat-menu-item-danger" data-action="delete">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
         </svg>
         <span>删除</span>
@@ -1897,21 +1922,129 @@ function showChatActionMenu(button: HTMLElement) {
     </div>
   `
   
+  menu.innerHTML = `
+    <style>
+      @keyframes menuSlideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+    </style>
+    ${menuContent}
+  `
+  
+  const buttonRect = button.getBoundingClientRect()
+  const menuWidth = 200
+  const menuHeight = 180
+  
+  let left = buttonRect.right + 8
+  let top = buttonRect.top + (buttonRect.height / 2) - (menuHeight / 2)
+  
+  if (left + menuWidth > window.innerWidth) {
+    left = buttonRect.left - menuWidth - 8
+  }
+  
+  if (top < 0) {
+    top = 8
+  }
+  
+  if (top + menuHeight > window.innerHeight) {
+    top = window.innerHeight - menuHeight - 8
+  }
+  
   menu.style.cssText = `
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: ${top}px;
+    left: ${left}px;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
     z-index: 999999;
-    min-width: 200px;
+    min-width: ${menuWidth}px;
+    overflow: hidden;
+    animation: menuSlideIn 0.2s ease-out;
   `
+  
+  menu.innerHTML = menuContent
+  
+  const style = document.createElement('style')
+  style.textContent = `
+    @keyframes menuSlideIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+  `
+  menu.appendChild(style)
   
   document.body.appendChild(menu)
   
   menu.querySelectorAll('.doubao-plus-chat-menu-item').forEach(item => {
+    const span = item.querySelector('span')
+    if (span) {
+      span.style.cssText = `
+        flex: 1;
+      `
+    }
+    
+    item.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      background: transparent;
+      border: 1px solid transparent;
+    `
+    
+    const isDanger = item.classList.contains('doubao-plus-chat-menu-item-danger')
+    if (isDanger) {
+      item.style.color = '#dc2626'
+    }
+    
+    const svg = item.querySelector('svg')
+    if (svg) {
+      svg.style.cssText = `
+        width: 18px;
+        height: 18px;
+        color: ${isDanger ? '#dc2626' : '#6b7280'};
+        transition: all 0.15s ease;
+      `
+    }
+    
+    item.addEventListener('mouseenter', () => {
+      item.style.background = isDanger ? '#fef2f2' : '#f8fafc'
+      item.style.borderColor = isDanger ? '#fecaca' : '#e2e8f0'
+      item.style.transform = 'translateX(2px)'
+      if (svg) {
+        svg.style.color = isDanger ? '#ef4444' : '#3b82f6'
+      }
+    })
+    
+    item.addEventListener('mouseleave', () => {
+      item.style.background = 'transparent'
+      item.style.borderColor = 'transparent'
+      item.style.transform = 'translateX(0)'
+      if (svg) {
+        svg.style.color = isDanger ? '#dc2626' : '#6b7280'
+      }
+    })
+    
     item.addEventListener('click', (e) => {
       e.stopPropagation()
       const action = item.getAttribute('data-action')
@@ -2005,6 +2138,31 @@ async function handleChatItemAction(action: string, chatItem: Element) {
           const updatedChats = chats.filter(c => c.id !== chatToDelete.id)
           await saveToDB('chats', updatedChats)
           alert('对话已删除')
+          
+          // 如果对话在文件夹中，只删除该对话本身
+          if (chatToDelete.folderId) {
+            console.log('Chat was in folder, removing chat from folder:', chatToDelete.folderId)
+            
+            // 只删除指定的对话，不影响其他对话
+            const updatedChats = chats.filter(c => c.id !== chatToDelete.id)
+            await saveToDB('chats', updatedChats)
+            console.log('Chat deleted, chats updated')
+          }
+          
+          // 刷新当前活动的标签页
+          const activeTab = document.querySelector('.doubao-plus-tab.active')
+          if (activeTab) {
+            const tabName = activeTab.getAttribute('data-tab')
+            console.log('Current tab:', tabName)
+            
+            if (tabName === 'folders') {
+              console.log('Refreshing folders tab')
+              loadContent('folders')
+            } else if (tabName === 'chats') {
+              console.log('Refreshing chats tab')
+              loadContent('chats')
+            }
+          }
         }
       }
       break

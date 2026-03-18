@@ -7,7 +7,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)
 ![React](https://img.shields.io/badge/React-19.0-blue)
 
-**豆包 AI 助手全能增强插件 - 集成文件夹管理、提示词库、时间轴导航等众多功能**
+**豆包 AI 助手增强插件 - 集成文件夹管理、提示词库等功能，帮助用户更好地组织和管理 AI 对话**
 
 [English](#english) | [简体中文](#简体中文)
 
@@ -22,34 +22,24 @@ Doubao Plus 是一个为豆包 AI 助手打造的全功能增强插件,提供文
 ### ✨ 核心功能
 
 #### 📂 文件夹管理
-- 两级文件夹层次结构
-- 拖拽排序支持
-- 自定义文件夹颜色
+- 多级文件夹层次结构（支持无限嵌套）
+- 自定义文件夹颜色（8种颜色可选）
 - 对话移动到文件夹
+- 子文件夹创建和管理
+- 文件夹展开/收起功能
 
 #### 💡 提示词库
 - 保存和复用提示词
 - 提示词分类管理
-- 快速插入提示词
-- 导入/导出功能
+- 快速插入提示词到输入框
+- 数据导入/导出功能（JSON格式）
 
-#### 📍 时间轴导航
-- 可视化节点跳转
-- 标记关键时刻
-- 管理对话分支
-
-#### 💾 聊天导出
-- 导出为 JSON
-- 导出为 Markdown
-- 导出为 PDF
-- 包含图片
-
-#### 🛠️ 实用工具
-- 批量删除对话
-- 引用回复
-- 标签页标题同步
-- 防止自动滚动
-- 输入框折叠
+#### 📋 对话管理
+- 保存对话到扩展
+- 对话列表展示
+- 对话星标功能
+- 对话删除功能
+- 对话跳转功能
 
 ### 🚀 快速开始
 
@@ -104,23 +94,25 @@ bun run build:all      # 所有浏览器
 - **样式方案**: TailwindCSS
 - **包管理器**: Bun
 - **状态管理**: React Context + Hooks
-- **存储方案**: chrome.storage.local
+- **存储方案**: IndexedDB
 
 ### 📁 项目结构
-
 ```
 doubao-plus/
 ├── public/              # 静态资源
 ├── src/
-│   ├── components/      # React 组件
-│   ├── contexts/       # React Context
-│   ├── core/           # 核心功能模块
-│   ├── features/       # 功能模块
-│   ├── hooks/          # 自定义 Hooks
-│   ├── pages/          # 页面组件
-│   └── utils/          # 工具函数
-├── docs/               # 文档
-└── tests/              # 测试文件
+│   ├── pages/          # 页面组件（popup, options）
+│   ├── types/          # TypeScript 类型定义
+│   ├── utils/          # 工具函数（storage等）
+│   ├── content.ts       # 内容脚本
+│   ├── background.ts    # 后台脚本
+│   ├── popup.tsx       # 弹出页面
+│   ├── options.tsx      # 选项页面
+│   └── index.css        # 全局样式
+├── build/              # 构建输出目录
+│   ├── chrome/         # Chrome 扩展构建
+│   └── firefox/        # Firefox 扩展构建
+└── scripts/           # 构建和打包脚本
 ```
 
 ### 🤝 贡献
@@ -137,39 +129,29 @@ doubao-plus/
 
 ### 📖 Introduction
 
-Doubao Plus is an all-in-one enhancement suite for Doubao AI Assistant, providing folder management, prompt library, timeline navigation, and more to help users better organize and manage AI conversations.
+Doubao Plus is an enhancement suite for Doubao AI Assistant, providing folder management, prompt library, and more to help users better organize and manage AI conversations.
 
 ### ✨ Features
 
 #### 📂 Folder Management
-- Two-level folder hierarchy
-- Drag-and-drop support
-- Custom folder colors
+- Multi-level folder hierarchy (unlimited nesting)
+- Custom folder colors (8 colors available)
 - Move conversations to folders
+- Create and manage subfolders
+- Folder expand/collapse functionality
 
 #### 💡 Prompt Vault
 - Save and reuse prompts
 - Prompt categorization
-- Quick prompt insertion
-- Import/Export functionality
+- Quick prompt insertion to input box
+- Data import/export (JSON format)
 
-#### 📍 Timeline Navigation
-- Visual node navigation
-- Mark key moments
-- Manage conversation branches
-
-#### 💾 Chat Export
-- Export to JSON
-- Export to Markdown
-- Export to PDF
-- Include images
-
-#### 🛠️ Power Tools
-- Batch delete conversations
-- Quote reply
-- Tab title sync
-- Prevent auto scroll
-- Input collapse
+#### 📋 Conversation Management
+- Save conversations to extension
+- Display conversation list
+- Star conversations
+- Delete conversations
+- Navigate to conversations
 
 ### 🚀 Quick Start
 
@@ -224,23 +206,25 @@ bun run build:all      # All browsers
 - **Styling**: TailwindCSS
 - **Package Manager**: Bun
 - **State Management**: React Context + Hooks
-- **Storage**: chrome.storage.local
+- **Storage**: IndexedDB
 
 ### 📁 Project Structure
-
 ```
 doubao-plus/
 ├── public/              # Static assets
 ├── src/
-│   ├── components/      # React components
-│   ├── contexts/       # React Context
-│   ├── core/           # Core modules
-│   ├── features/       # Feature modules
-│   ├── hooks/          # Custom Hooks
-│   ├── pages/          # Page components
-│   └── utils/          # Utility functions
-├── docs/               # Documentation
-└── tests/              # Test files
+│   ├── pages/          # Page components (popup, options)
+│   ├── types/          # TypeScript type definitions
+│   ├── utils/          # Utility functions (storage, etc.)
+│   ├── content.ts       # Content script
+│   ├── background.ts    # Background script
+│   ├── popup.tsx       # Popup page
+│   ├── options.tsx      # Options page
+│   └── index.css        # Global styles
+├── build/              # Build output directory
+│   ├── chrome/         # Chrome extension build
+│   └── firefox/        # Firefox extension build
+└── scripts/           # Build and packaging scripts
 ```
 
 ### 🤝 Contributing

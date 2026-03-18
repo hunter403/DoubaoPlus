@@ -97,6 +97,10 @@ async function handleBackgroundMessage(request: any, sender: any) {
         await StorageManager.deletePrompt(request.promptId)
         return { status: 'success' }
       
+      case 'deleteChat':
+        await StorageManager.deleteChat(request.chatId)
+        return { status: 'success' }
+      
       case 'usePrompt':
         const promptsToUse = await StorageManager.getPrompts()
         const promptToUse = promptsToUse.find(p => p.id === request.promptId)

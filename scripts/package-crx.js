@@ -6,20 +6,13 @@ import { copyFileSync, readFileSync, writeFileSync, existsSync, mkdirSync } from
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8')
 )
 const version = packageJson.version
-
 const outputDir = path.join(__dirname, '../dist')
 const buildDir = path.join(__dirname, '../build/chrome')
 const zipFile = path.join(outputDir, `doubao-plus-v${version}.zip`)
-const manifestSource = path.join(__dirname, '../manifest.json')
-const manifestTarget = path.join(buildDir, 'manifest.json')
-
-const publicIconsDir = path.join(__dirname, '../public/icons')
-const buildIconsDir = path.join(buildDir, 'icons')
 
 function prepareBuild() {
   console.log('📝 准备构建文件...')
@@ -28,8 +21,8 @@ function prepareBuild() {
     fs.mkdirSync(buildDir, { recursive: true })
   }
   
-  if (!fs.existsSync(buildIconsDir)) {
-    fs.mkdirSync(buildIconsDir, { recursive: true })
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true })
   }
   
   let cssFileName = null
@@ -43,8 +36,8 @@ function prepareBuild() {
     }
   }
   
-  if (fs.existsSync(manifestSource)) {
-    const manifest = JSON.parse(readFileSync(manifestSource, 'utf-8'))
+  if (fs.existsSync(path.join(__dirname, '../manifest.json'))) {
+    const manifest = JSON.parse(readFileSync(path.join(__dirname, '../manifest.json'), 'utf-8'))
     
     manifest.background = {
       service_worker: 'background.js'
@@ -62,14 +55,14 @@ function prepareBuild() {
     
     manifest.content_scripts = [contentScriptConfig]
     
-    writeFileSync(manifestTarget, JSON.stringify(manifest, null, 2))
+    writeFileSync(path.join(buildDir, 'manifest.json'), JSON.stringify(manifest, null, 2))
     console.log('✅ manifest.json 已修正并复制到构建目录')
   }
   
   const iconFiles = ['icon16.png', 'icon48.png', 'icon128.png']
   for (const iconFile of iconFiles) {
-    const sourcePath = path.join(publicIconsDir, iconFile)
-    const targetPath = path.join(buildIconsDir, iconFile)
+    const sourcePath = path.join(__dirname, '../public/icons', iconFile)
+    const targetPath = path.join(buildDir, 'icons', iconFile)
     
     if (fs.existsSync(sourcePath)) {
       copyFileSync(sourcePath, targetPath)
@@ -105,7 +98,7 @@ function verifyBuildFiles(cssFileName) {
   
   for (const file of requiredFiles) {
     const filePath = path.join(buildDir, file)
-    if (existsSync(filePath)) {
+    if (fs.existsSync(filePath)) {
       existingFiles.push(file)
       console.log(`  ✅ ${file}`)
     } else {
@@ -117,7 +110,7 @@ function verifyBuildFiles(cssFileName) {
   console.log(`\n📊 验证结果: ${existingFiles.length}/${requiredFiles.length} 文件存在`)
   
   if (missingFiles.length > 0) {
-    console.log(`\n⚠️  缺失文件: ${missingFiles.join(', ')}`)
+    console.log(`\n⚠️ 缺失文件: ${missingFiles.join(', ')}`)
     return false
   }
   
@@ -125,30 +118,30 @@ function verifyBuildFiles(cssFileName) {
 }
 
 function createZip() {
-  console.log('\n📦 开始打包 ZIP 文件...')
-
+  console.log('\n📦 开始创建 ZIP 文件...')
+  
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true })
   }
-
+  
   const output = fs.createWriteStream(zipFile)
   const archive = archiver('zip', { zlib: { level: 9 } })
-
+  
   output.on('close', () => {
     console.log(`\n✅ ZIP 文件已创建: ${zipFile}`)
     console.log(`📊 文件大小: ${(archive.pointer() / 1024).toFixed(2)} KB`)
   })
-
+  
   archive.on('error', (err) => {
     throw err
   })
-
+  
   archive.pipe(output)
-
+  
   if (fs.existsSync(buildDir)) {
     archive.directory(buildDir, false)
   }
-
+  
   archive.finalize()
 }
 
@@ -166,10 +159,10 @@ try {
   createZip()
   
   console.log('\n' + '='.repeat(50))
-  console.log('✨ 打包完成!')
+  console.log('✨ ZIP 文件创建完成!')
   console.log(`\n📍 ZIP 文件位置: ${zipFile}`)
-  console.log(`\n📝 提示: 可以直接将 ZIP 文件拖拽到 Chrome 扩展管理页面安装`)
-  console.log(`\n📝 提示: 或者解压 ZIP 文件，使用 build/chrome 文件夹加载未打包的扩展`)
+  console.log(`\n📝 安装提示: 可以直接将 ZIP 文件拖拽到 Chrome 扩展管理页面安装`)
+  console.log('\n' + '='.repeat(50))
 } catch (error) {
   console.error('\n❌ 打包失败:', error.message)
   process.exit(1)
