@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Doubao Plus",
+  "version": "0.1.0",
+  "description": "An all-in-one enhancement suite for Doubao AI",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://www.doubao.com/*",
+    "https://doubao.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.doubao.com/*",
+        "https://doubao.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["assets/index-B4Vq6bW2.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

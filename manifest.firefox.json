@@ -1,0 +1,41 @@
+{
+  "manifest_version": 2,
+  "name": "Doubao Plus - 豆包增强插件",
+  "version": "0.1.0",
+  "description": "An all-in-one enhancement suite for Doubao AI - folder management, prompt library, timeline navigation, and more.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "<all_urls>"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "scripts": ["src/background.ts"]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.doubao.com/*",
+        "https://doubao.com/*"
+      ],
+      "js": ["src/content.ts"],
+      "css": ["src/index.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "options_page": "options.html",
+  "web_accessible_resources": ["assets/*"]
+}

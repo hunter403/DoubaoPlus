@@ -1,0 +1,14 @@
+dist
+build
+node_modules
+coverage
+*.log
+.DS_Store
+.vscode
+.idea
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+*.backup
+README.md.backup

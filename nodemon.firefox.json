@@ -1,0 +1,6 @@
+{
+  "watch": ["src", "manifest.firefox.json", "vite.config.firefox.ts"],
+  "ext": "ts,tsx,json",
+  "ignore": ["build", "dist", "node_modules"],
+  "exec": "bun run build:firefox"
+}
